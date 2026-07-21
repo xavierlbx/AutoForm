@@ -1,3 +1,33 @@
 ---
+description: Regras de segurança, privacidade e tratamento de dados sensíveis do usuário (API key, currículo, contexto).
+globs:
+  - "src/**/*"
 alwaysApply: true
 ---
+
+# Segurança e Privacidade
+
+## Dados sensíveis em jogo
+
+- `apiKey` — credencial do usuário para o provedor de IA.
+- `rawContext` — texto derivado do currículo/bio do usuário (dado pessoal).
+- Conteúdo dos formulários que a IA vai preencher (pode conter dados pessoais de terceiros, ex.: formulários de vaga, cadastro, etc.).
+
+Tratar todos os três como sensíveis por padrão.
+
+## Regras obrigatórias
+
+1. **Nunca logar dados sensíveis.** Proibido `console.log` de `apiKey`, `rawContext` completo, ou do payload enviado à IA em builds de produção. Se for necessário debugar, logar apenas metadados (ex.: `contexto: 1240 caracteres`), nunca o conteúdo.
+2. **Nunca transmitir para servidor próprio.** Não existe backend — qualquer código que crie uma chamada `fetch` para um domínio que não seja o do provedor de IA escolhido pelo usuário deve ser tratado como bug crítico.
+3. **Armazenamento exclusivo em `chrome.storage.local`.** Nunca usar `chrome.storage.sync` para `apiKey` ou `rawContext` (o `sync` replica para a conta Google do usuário e sai do controle "100% local" prometido no produto). `localStorage`/`sessionStorage` do DOM também não devem ser usados para esses dados.
+4. **Exibição da API key.** No campo de input da API key, usar `type="password"` por padrão, com opção explícita de "mostrar/ocultar". Nunca renderizar a key completa em texto solto na UI fora desse campo.
+5. **Minimizar o que é enviado à IA.** Ao montar o prompt de preenchimento, enviar apenas os campos do formulário (label, tipo, opções) + o `rawContext` necessário — nunca o HTML bruto da página, cookies, ou dados de outras abas.
+6. **Sanitização de entrada.** Texto extraído de PDF/DOCX e colado pelo usuário deve ser tratado como texto puro ao ser inserido no DOM (usar `textContent`, nunca `innerHTML` sem sanitização) para evitar XSS via conteúdo de arquivo malicioso.
+7. **Permissões mínimas.** Seguir o princípio de menor privilégio no `manifest.json` (ver `02-architecture.mdc`). Qualquer nova permissão solicitada deve ser justificada em `docs/TASKS.md` antes de ser adicionada. (`webNavigation` está justificado ali: só `getAllFrames` no fill para iframes.)
+8. **Sem telemetria/analytics.** Proibido incluir qualquer SDK de analytics, crash reporting remoto, ou pixel de rastreamento. Erros ficam só no `console.error` local do usuário.
+9. **Exclusão de dados.** A Tela 2 (Configurar Contexto) deve sempre oferecer uma forma clara de apagar o contexto salvo (`chrome.storage.local.remove` / `clear`), já que não há "conta" para o usuário gerenciar de outra forma.
+10. **Aviso de custo/uso de terceiro.** Como a chamada de IA é feita direto para o provedor externo com a key do próprio usuário, a UI deve deixar claro (ex.: texto pequeno na Tela 2) que o uso está sujeito aos termos e custos do provedor escolhido — a extensão não é responsável por cobranças.
+
+## Revisão antes de merge
+
+Qualquer PR que toque em `core/storage.ts`, `core/ai/**`, ou no `content-script.ts` (que escreve valores no DOM da página do usuário) deve ser revisado explicitamente contra esta lista antes de ser aceito.

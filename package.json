@@ -1,0 +1,39 @@
+{
+  "name": "autoform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Chrome extension that fills web forms using AI from a local user context",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "smoke:extract": "node scripts/smoke-file-extract.mjs"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.2.0",
+    "@eslint/js": "^9.28.0",
+    "@types/chrome": "^0.0.326",
+    "@types/jsdom": "^28.0.3",
+    "@types/node": "^22.15.30",
+    "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
+    "globals": "^16.2.0",
+    "jsdom": "^29.1.1",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.1",
+    "vite": "^6.3.5",
+    "vitest": "^3.2.1"
+  },
+  "dependencies": {
+    "mammoth": "^1.12.0",
+    "pdfjs-dist": "^6.1.200"
+  }
+}

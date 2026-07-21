@@ -1,0 +1,84 @@
+---
+description: Estrutura do Manifest V3, organização de pastas, módulos e mensageria entre contextos da extensão.
+globs:
+  - "src/**/*"
+  - "manifest.json"
+alwaysApply: true
+---
+
+# Arquitetura (Manifest V3)
+
+## Contextos da extensão
+
+A extensão tem 3 contextos isolados que só se comunicam via `chrome.runtime` messaging:
+
+1. **Popup** (`src/popup`) — UI (Tela 1 Home e Tela 2 Configurar Contexto). Não tem acesso direto ao DOM da página do usuário.
+2. **Content Script** (`src/content`) — injetado na aba ativa. Responsável por ler o DOM do formulário visível e por escrever os valores nos campos (`input`, `select`, `textarea`, contenteditable).
+3. **Background / Service Worker** (`src/background`) — orquestra a comunicação: recebe o pedido "preencher" do popup, pede o DOM ao content script, monta o prompt, chama a API de IA, e devolve o mapeamento campo→valor para o content script aplicar.
+
+O popup **não** deve chamar a API de IA diretamente nem manipular o DOM da página — ele apenas dispara mensagens para o background.
+
+## Estrutura de pastas sugerida
+
+```
+src/
+├── popup/
+│   ├── index.html
+│   ├── main.ts              # bootstrap da UI, alterna Tela 1 / Tela 2
+│   ├── views/
+│   │   ├── home-view.ts     # Tela 1: status do contexto + botão Preencher
+│   │   └── context-view.ts  # Tela 2: API key, upload, textarea, salvar
+│   └── styles.css
+├── content/
+│   └── content-script.ts    # extrai campos do form + aplica valores
+├── background/
+│   └── service-worker.ts    # orquestra mensagens e chama a IA
+├── core/
+│   ├── storage.ts           # wrapper tipado de chrome.storage.local
+│   ├── file-extractor.ts    # extração de texto de pdf/docx (pdfjs/mammoth)
+│   ├── ai/
+│   │   ├── ai-provider.ts   # interface comum (prompt in -> mapeamento out)
+│   │   └── providers/
+│   │       └── openai-provider.ts   # (ou gemini/groq, ver TASKS.md)
+│   ├── form-scanner.ts      # detecta campos preenchíveis no DOM
+│   └── types.ts             # LocalStorageData, FormField, AiFillResult, etc.
+└── shared/
+    └── messages.ts          # tipos e constantes das mensagens runtime
+manifest.json
+```
+
+## Regras de mensageria
+
+- Toda mensagem entre popup ↔ background ↔ content script deve ter um tipo tipado definido em `src/shared/messages.ts` (union type com `type` discriminante). Não usar objetos soltos sem tipo.
+- Exemplo de fluxo do botão "Preencher":
+  1. `popup` → `background`: `{ type: 'FILL_REQUEST' }`
+  2. `background` → `content`: `{ type: 'SCAN_FORM' }`
+  3. `content` → `background`: `{ type: 'FORM_FIELDS', fields: FormField[] }`
+  4. `background` monta o prompt com `rawContext` + `fields`, chama o `AiProvider`
+  5. `background` → `content`: `{ type: 'APPLY_VALUES', values: FieldValue[] }`
+  6. `content` preenche o DOM e responde `{ type: 'FILL_DONE', count: number }`
+  7. `background` → `popup`: repassa o resultado para exibir feedback
+
+## Manifest V3
+
+- `manifest_version: 3`.
+- `action` define o popup (`default_popup: src/popup/index.html`).
+- `background.service_worker` aponta para `service-worker.ts` compilado, `type: "module"`.
+- `content_scripts` injetado em `http://*/*` / `https://*/*` com `all_frames: true` (inclui iframes cross-origin de ATS), `run_at: document_idle`.
+- Permissões mínimas necessárias: `storage`, `activeTab`, `scripting`, `webNavigation` (só `getAllFrames` no fill). Evitar `tabs` e `<all_urls>` em `host_permissions` se `activeTab` for suficiente — pedir a menor permissão possível é requisito de review da Chrome Web Store.
+- `content_security_policy.extension_pages` deve usar o padrão restrito do MV3 (sem `unsafe-eval`, sem scripts remotos).
+
+## `form-scanner.ts` (content script)
+
+- Deve extrair, para cada campo visível e habilitado: um seletor estável (ex.: `id`, `name`, ou um `data-*` sintético se não houver nenhum), o `label` associado (via `<label for>`, `aria-label`, texto próximo, ou `placeholder`), o `type` do campo, e as `options` no caso de `select`/`radio`.
+- Nunca enviar o HTML inteiro da página para a IA — só a lista estruturada de campos. Isso reduz custo de tokens e risco de vazar conteúdo irrelevante da página.
+
+## `ai-provider.ts`
+
+- Interface única, por exemplo:
+  ```ts
+  interface AiProvider {
+    fillForm(context: string, fields: FormField[]): Promise<FieldValue[]>;
+  }
+  ```
+- Cada provedor (OpenAI, Gemini, Groq) implementa essa interface em `core/ai/providers/`. O MVP pode implementar apenas um provedor, mas o código deve ser escrito contra a interface, não contra o provedor concreto, para permitir trocar depois sem refatorar o background.

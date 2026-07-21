@@ -1,3 +1,43 @@
 ---
+description: Stack de tecnologias, bibliotecas e ferramentas de build permitidas no projeto.
+globs:
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/*.js"
+  - "**/*.json"
+  - "package.json"
 alwaysApply: true
 ---
+
+# Tech Stack
+
+## Linguagem e build
+
+- **TypeScript** em todo o código novo (`strict: true` no `tsconfig.json`). Não escrever `.js` à mão.
+- **Vite** como bundler, usando `@crxjs/vite-plugin` (ou equivalente) para gerar a extensão Manifest V3 a partir do `manifest.json`.
+- **Sem framework de UI pesado.** Popup e páginas internas são HTML + TypeScript "vanilla" com DOM API, ou, se a complexidade justificar, **Preact** (não React puro) pelo tamanho de bundle reduzido. Qualquer decisão de trocar para Preact deve ser explícita e discutida — não assumir por padrão.
+- **CSS puro** (ou um único arquivo `styles.css` com variáveis CSS). Sem Tailwind/CSS-in-JS no MVP — overhead desnecessário para uma UI pequena de popup.
+
+## Extração de arquivos (client-side)
+
+- **PDF:** [`pdfjs-dist`](https://www.npmjs.com/package/pdfjs-dist) (biblioteca do próprio Firefox/Mozilla) para extrair texto de `.pdf` inteiramente no navegador. Não usar libs que dependam de servidor de conversão.
+- **Word (.docx):** [`mammoth`](https://www.npmjs.com/package/mammoth) para converter `.docx` em texto/HTML no navegador. Não suportar `.doc` binário legado no MVP (fora de escopo).
+- Ambas as libs rodam no contexto da extensão (popup ou um worker), nunca via upload para serviço externo.
+
+## Chamadas de IA
+
+- Chamadas HTTP diretas via `fetch` para a API do provedor escolhido pelo usuário (ex.: OpenAI `chat.completions`, Google Gemini `generateContent`, Groq). Sem SDK pesado — `fetch` nativo é suficiente e reduz o bundle.
+- A extensão deve ser desenhada para suportar múltiplos provedores atrás de uma interface simples (`AiProvider`), mesmo que o MVP implemente só um provedor inicialmente (ver `02-architecture.mdc`).
+- Nunca embutir uma API key própria da extensão no código. A key é sempre a que o usuário insere.
+
+## Qualidade de código
+
+- **ESLint + Prettier** configurados desde o início.
+- Testes: **Vitest** para lógica pura (parsers, formatadores de prompt, mapeamento de campos). Não é necessário cobrir manipulação de DOM em testes no MVP.
+- Sem dependências com licenças restritivas ou que exijam chamadas de rede para telemetria (ex.: nada que "phone home").
+
+## Proibido no MVP
+
+- Frameworks de estado global (Redux, Zustand, etc.) — o estado cabe inteiro em `chrome.storage.local` e em variáveis locais de componente.
+- Backend próprio, mesmo que "serverless" (sem Firebase, Supabase, Vercel functions, etc.).
+- Bibliotecas de autenticação/login.

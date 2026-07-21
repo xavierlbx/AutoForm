@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>autoForm — formulário de teste</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.45;
+      }
+      body {
+        max-width: 40rem;
+        margin: 2rem auto;
+        padding: 0 1rem 3rem;
+        color: #1a1a1a;
+      }
+      h1 {
+        font-size: 1.4rem;
+        margin-bottom: 0.25rem;
+      }
+      .hint {
+        color: #555;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+      }
+      fieldset {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin: 0 0 1.25rem;
+        padding: 1rem 1.1rem 1.1rem;
+      }
+      legend {
+        font-weight: 600;
+        padding: 0 0.35rem;
+      }
+      label {
+        display: block;
+        margin: 0.65rem 0 0.25rem;
+        font-size: 0.92rem;
+      }
+      input[type='text'],
+      input[type='email'],
+      input[type='tel'],
+      input[type='url'],
+      input[type='number'],
+      input[type='date'],
+      select,
+      textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0.45rem 0.55rem;
+        border: 1px solid #bbb;
+        border-radius: 6px;
+        font: inherit;
+      }
+      textarea {
+        min-height: 5rem;
+        resize: vertical;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.25rem;
+        margin-top: 0.5rem;
+      }
+      .row label {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin: 0;
+        font-weight: normal;
+      }
+      button[type='submit'] {
+        margin-top: 0.5rem;
+        padding: 0.55rem 1.1rem;
+        font: inherit;
+        border: none;
+        border-radius: 6px;
+        background: #0f766e;
+        color: #fff;
+        cursor: pointer;
+      }
+      button[type='submit']:hover {
+        background: #0d9488;
+      }
+      #log {
+        margin-top: 1rem;
+        font-size: 0.85rem;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Formulário de teste — autoForm</h1>
+    <p class="hint">
+      Abra esta página no Chrome com a extensão carregada, configure o contexto e
+      use <strong>Preencher Formulário</strong>. Inclui text, email, tel, select,
+      radio, checkbox, textarea e data — útil para validar scan + apply localmente.
+    </p>
+
+    <form id="demo-form" action="#" method="get">
+      <fieldset>
+        <legend>Dados pessoais</legend>
+        <label for="full-name">Nome completo</label>
+        <input id="full-name" name="full_name" type="text" autocomplete="name" />
+
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" autocomplete="email" />
+
+        <label for="phone">Telefone</label>
+        <input id="phone" name="phone" type="tel" autocomplete="tel" />
+
+        <label for="city">Cidade</label>
+        <input id="city" name="city" type="text" placeholder="Ex.: São Paulo" />
+
+        <label for="birth-date">Data de nascimento</label>
+        <input id="birth-date" name="birth_date" type="date" />
+      </fieldset>
+
+      <fieldset>
+        <legend>Perfil profissional</legend>
+        <label for="role">Cargo desejado</label>
+        <input id="role" name="role" type="text" />
+
+        <label for="years">Anos de experiência</label>
+        <input id="years" name="years" type="number" min="0" max="50" />
+
+        <label for="seniority">Nível</label>
+        <select id="seniority" name="seniority">
+          <option value="">Selecione…</option>
+          <option value="junior">Júnior</option>
+          <option value="mid">Pleno</option>
+          <option value="senior">Sênior</option>
+          <option value="lead">Lead</option>
+        </select>
+
+        <label for="linkedin">LinkedIn (URL)</label>
+        <input id="linkedin" name="linkedin" type="url" placeholder="https://" />
+
+        <label for="summary">Resumo / bio</label>
+        <textarea
+          id="summary"
+          name="summary"
+          placeholder="Conte um pouco sobre você"
+        ></textarea>
+      </fieldset>
+
+      <fieldset>
+        <legend>Preferências</legend>
+        <p style="margin: 0 0 0.35rem; font-size: 0.92rem">
+          Modalidade de trabalho
+        </p>
+        <div class="row" role="radiogroup" aria-label="Modalidade de trabalho">
+          <label>
+            <input type="radio" name="work_mode" value="remote" />
+            Remoto
+          </label>
+          <label>
+            <input type="radio" name="work_mode" value="hybrid" />
+            Híbrido
+          </label>
+          <label>
+            <input type="radio" name="work_mode" value="onsite" />
+            Presencial
+          </label>
+        </div>
+
+        <p style="margin: 1rem 0 0.35rem; font-size: 0.92rem">Interesses</p>
+        <div class="row">
+          <label>
+            <input type="checkbox" name="interest_backend" value="backend" />
+            Backend
+          </label>
+          <label>
+            <input type="checkbox" name="interest_frontend" value="frontend" />
+            Frontend
+          </label>
+          <label>
+            <input type="checkbox" name="interest_devops" value="devops" />
+            DevOps
+          </label>
+        </div>
+
+        <label style="margin-top: 1rem">
+          <input id="relocate" name="relocate" type="checkbox" value="yes" />
+          Disponível para mudança de cidade
+        </label>
+      </fieldset>
+
+      <button type="submit">Enviar (só para inspeção local)</button>
+    </form>
+
+    <p id="log" aria-live="polite"></p>
+
+    <script>
+      document.getElementById('demo-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = new FormData(e.target);
+        const entries = [...data.entries()]
+          .map(([k, v]) => k + '=' + v)
+          .join(', ');
+        document.getElementById('log').textContent =
+          'Valores atuais: ' + (entries || '(vazio)');
+      });
+    </script>
+  </body>
+</html>

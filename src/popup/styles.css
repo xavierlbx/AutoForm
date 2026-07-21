@@ -1,0 +1,347 @@
+:root {
+  color-scheme: light;
+
+  /* Earth tone palette — #000000 #1F150C #412D15 #E1DCC9 */
+  --palette-black: #000000;
+  --palette-espresso: #1f150c;
+  --palette-brown: #412d15;
+  --palette-cream: #e1dcc9;
+
+  --bg: var(--palette-cream);
+  --surface: #f0ede4;
+  --fg: var(--palette-espresso);
+  --muted: #5c4f42;
+  --accent: var(--palette-brown);
+  --accent-hover: var(--palette-espresso);
+  --accent-active: var(--palette-black);
+  --accent-soft: #ebe7dc;
+  --link: var(--palette-black);
+  --border: #c9c4b5;
+  --border-strong: var(--palette-brown);
+  --danger: var(--palette-black);
+  --danger-soft: #d9d4c8;
+  --danger-border: #a8a399;
+  --success: var(--palette-brown);
+  --success-soft: var(--accent-soft);
+  --success-border: #a89880;
+  --warn: var(--palette-brown);
+  --on-accent: var(--palette-cream);
+  --shadow: rgba(31, 21, 12, 0.08);
+  --shadow-strong: rgba(31, 21, 12, 0.14);
+  --radius: 8px;
+  --radius-sm: 6px;
+  --motion: 150ms ease;
+
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 340px;
+  max-width: 400px;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+#app {
+  padding: 18px 16px 20px;
+}
+
+.view-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 12px;
+  border-left: 3px solid var(--palette-brown);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 650;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+
+.subtitle,
+.hint,
+.notice {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.notice {
+  padding: 10px 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.nav-row,
+.actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actions-row {
+  padding-top: 2px;
+}
+
+.input-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.input-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+button,
+.link-button {
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color var(--motion),
+    border-color var(--motion),
+    color var(--motion),
+    box-shadow var(--motion),
+    opacity var(--motion);
+}
+
+button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--accent-soft);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+button.primary:active:not(:disabled) {
+  background: var(--accent-active);
+  border-color: var(--accent-active);
+}
+
+button.primary.is-loading {
+  opacity: 0.88;
+  cursor: wait;
+}
+
+button.ghost {
+  background: var(--surface);
+  white-space: nowrap;
+}
+
+button.danger {
+  background: var(--surface);
+  border-color: var(--danger-border);
+  color: var(--danger);
+}
+
+button.danger:hover:not(:disabled) {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.link-button {
+  border: none;
+  background: none;
+  color: var(--link);
+  padding: 0;
+  text-align: left;
+  text-decoration: underline;
+  align-self: flex-start;
+}
+
+.link-button:hover {
+  color: var(--accent-hover);
+}
+
+.link-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.fill-button {
+  width: 100%;
+  font-weight: 600;
+  padding: 10px 14px;
+  box-shadow: 0 2px 6px var(--shadow-strong);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  background: var(--surface);
+  transition:
+    border-color var(--motion),
+    box-shadow var(--motion);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8a8070;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(65, 45, 21, 0.22);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.45;
+}
+
+select {
+  width: 100%;
+}
+
+input[type='file'] {
+  padding: 6px;
+  font-size: 0.75rem;
+}
+
+.status {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.status--ready {
+  border-color: var(--success-border);
+  background: var(--accent-soft);
+  color: var(--success);
+}
+
+.status--empty {
+  color: var(--muted);
+}
+
+.status--loading {
+  color: var(--muted);
+}
+
+.char-counter {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+.char-counter--warn {
+  color: var(--warn);
+}
+
+.char-counter--over {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.feedback {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted);
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.feedback--success {
+  color: var(--success);
+  background: var(--success-soft);
+  border-color: var(--success-border);
+}
+
+.feedback--error {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: var(--danger-border);
+}
+
+.feedback--info {
+  color: var(--muted);
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.upload-status--ok {
+  color: var(--success);
+}
+
+.upload-status--error {
+  color: var(--danger);
+}

@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "autoForm",
+  "version": "0.1.0",
+  "description": "Preenche formulários web com IA a partir do seu contexto local (currículo/bio).",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_title": "autoForm",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background/service-worker.ts",
+    "type": "module"
+  },
+  "permissions": ["storage", "activeTab", "scripting", "webNavigation"],
+  "host_permissions": [
+    "https://api.openai.com/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["src/content/content-script.ts"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
